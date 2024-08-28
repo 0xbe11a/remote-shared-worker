@@ -1,6 +1,6 @@
 {
   "name": "remote-shared-worker",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "twist of SharedWorker to allow CORS",
   "main": "index.js",
   "types": "index.d.ts",
