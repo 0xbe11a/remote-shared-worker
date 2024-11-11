@@ -1,88 +1,139 @@
 
-# Remote-Shared-Worker
+# 🚀 Remote-Shared-Worker
 
-A handy tool that makes it easy to use `SharedWorker` with scripts from other websites. It’s like giving your worker superpowers to talk to scripts from anywhere—even across different websites—without running into CORS problems!
+A powerful tool that extends the native `SharedWorker` functionality, making it easy to load and use scripts from different domains. It bypasses common CORS issues, enables dynamic cookie syncing, and provides enhanced control over session management.
 
-- **Talk to Workers on Other Websites:** You can now use scripts from other websites without running into problems.
-- **No More CORS Issues:** CORS (Cross-Origin Resource Sharing) can be tricky when trying to load scripts from different websites. `RemoteSharedWorker` solves this by wrapping your scripts in a way that avoids CORS issues, so everything just works!
-- **Make Sure Everything Loads Right:** It makes sure all the parts of your script load correctly, even if they’re from different places.
+## 🌟 Key Features
+- **Cross-Origin Script Support:** Seamlessly load and interact with scripts from different websites without running into CORS problems.
+- **Automatic Cookie Syncing:** Keeps your cookies synchronized between the main thread and the worker, ensuring consistent session management.
+- **Dynamic Cookie Filtering:** Customize the list of cookies to sync based on specific prefixes, allowing flexible control over data sharing.
+- **Automatic Cookie Cleanup:** Periodically removes expired cookies from the stored list to prevent stale data.
+- **Custom `importScripts` Handling:** Overrides `importScripts` in the worker to resolve script URLs relative to the worker script, ensuring compatibility across origins.
 
-## Installing
+## 📦 Installation
 
-To get started, you need to install this package. 
+To get started, install the package via npm:
 
 ```bash
 npm install remote-shared-worker
 ```
 
-## How to Use
+## 🛠️ Usage
 
-Once you’ve installed it, you can start using your new `RemoteSharedWorker` just like you’d use a regular `SharedWorker`. But now, it can load scripts from anywhere!
+After installation, you can use `RemoteSharedWorker` just like a regular `SharedWorker`, but with enhanced features for cross-origin compatibility and cookie management.
+
+### Basic Example
 
 ```javascript
 import RemoteSharedWorker from 'remote-shared-worker';
 
 const worker = new RemoteSharedWorker('https://example.com/worker.js');
 
-// Start talking to your worker!
 worker.port.start();
-worker.port.postMessage('Hi there, remote worker!');
+worker.port.postMessage('Hello, remote worker!');
 ```
 
-### Snippet of how to call
+### 📌 Example: Local Script Usage
 
 ```javascript
 import RemoteSharedWorker from 'remote-shared-worker';
 
 const worker = new RemoteSharedWorker('worker.js');
 
-worker.port.onmessage = function(event) {
-  console.log('The worker says:', event.data);
+worker.port.onmessage = (event) => {
+  console.log('Message from worker:', event.data);
 };
 
 worker.port.postMessage('Hello, worker!');
 ```
 
-### Call Worker from another website
+### 🌐 Example: Cross-Origin Script
 
 ```javascript
 import RemoteSharedWorker from 'remote-shared-worker';
 
-const worker = new RemoteSharedWorker('https://example.com/worker.js');
+const worker = new RemoteSharedWorker('https://external-site.com/worker.js');
 
-worker.port.onmessage = function(event) {
-  console.log('Message from the cross-origin worker:', event.data);
+worker.port.onmessage = (event) => {
+  console.log('Message from cross-origin worker:', event.data);
 };
 
 worker.port.postMessage('Hello from the main thread!');
 ```
-### Dynamic Cookie Syncing
+
+## 🍪 Advanced Cookie Management
+
+The `RemoteSharedWorker` provides robust cookie handling capabilities, making it easy to sync and manage session-related cookies between the main thread and the worker.
+
+### 🔄 How Cookie Syncing Works
+- **Automatic Syncing:** The main thread sends cookies to the worker at regular intervals (every 5 seconds).
+- **Filtered Syncing:** Only cookies matching specified prefixes are synced, reducing unnecessary data transfer.
+- **Cross-Origin Compatibility:** Handles cookie synchronization even when using cross-origin scripts.
+
+### 🎯 Custom Cookie Filtering
+
+You can dynamically update the list of cookie prefixes to be synced using the `updateFilter()` method.
+
 ```javascript
 import RemoteSharedWorker from 'remote-shared-worker';
 
 const worker = new RemoteSharedWorker('worker.js');
 
-// Update the cookie filter to sync only session-related cookies
-worker.updateFilter(['session_', 'auth_']);
+worker.updateFilter(['custom_', 'tracking_', 'auth_']);
 
 worker.port.onmessage = (event) => {
-  console.log('Cookies synced with the worker:', event.data);
+  console.log('Filtered cookies:', event.data);
 };
 
-worker.port.postMessage('Requesting cookies from the worker.');
+worker.port.postMessage('Requesting filtered cookies.');
 ```
 
-### Cookie Lifetime Management
+### 🧹 Automatic Cookie Cleanup
+
+The worker periodically checks for expired cookies and removes them to prevent stale data.
+
 ```javascript
 import RemoteSharedWorker from 'remote-shared-worker';
 
 const worker = new RemoteSharedWorker('worker.js');
 
-// The worker handles cookie expiry cleanup automatically
 worker.port.onmessage = (event) => {
-  console.log('Received up-to-date cookies:', event.data);
+  console.log('Valid cookies after cleanup:', event.data);
 };
 
 worker.port.postMessage('Check for expired cookies.');
-
 ```
+
+### 🔍 Cookie Syncing in Depth
+
+#### 1. **Syncing Process**
+- The `syncCookies()` method retrieves cookies from `document.cookie` in the main thread.
+- The cookies are filtered based on the prefixes specified in `updateFilter()`.
+- The filtered cookies are sent to the worker using `port.postMessage()`.
+
+#### 2. **Dynamic Filter Updates**
+- Use `updateFilter(newFilter)` to change the list of cookie prefixes at any time.
+
+Example:
+
+```javascript
+worker.updateFilter(['session_']);
+```
+
+#### 3. **Cookie Expiration Handling**
+- The worker inspects each cookie’s `expires` attribute and excludes expired cookies.
+
+## 🔧 Implementation Details
+
+The `RemoteSharedWorker` enhances `SharedWorker` with:
+- **Custom `importScripts` Override**
+- **Automatic Cookie Syncing**
+- **Cookie Expiration Handling**
+
+## 🛑 Troubleshooting
+- Ensure the script URL is accessible and supports cross-origin requests.
+- Verify that cookies are not blocked by browser settings.
+
+## 📝 Notes
+- **Browser Compatibility:** Works with browsers that support `SharedWorker`.
+- **Security:** Be cautious when syncing cookies. Use trusted scripts only.
