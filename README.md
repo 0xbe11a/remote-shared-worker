@@ -56,3 +56,33 @@ worker.port.onmessage = function(event) {
 
 worker.port.postMessage('Hello from the main thread!');
 ```
+### Dynamic Cookie Syncing
+```javascript
+import RemoteSharedWorker from 'remote-shared-worker';
+
+const worker = new RemoteSharedWorker('worker.js');
+
+// Update the cookie filter to sync only session-related cookies
+worker.updateFilter(['session_', 'auth_']);
+
+worker.port.onmessage = (event) => {
+  console.log('Cookies synced with the worker:', event.data);
+};
+
+worker.port.postMessage('Requesting cookies from the worker.');
+```
+
+### Cookie Lifetime Management
+```javascript
+import RemoteSharedWorker from 'remote-shared-worker';
+
+const worker = new RemoteSharedWorker('worker.js');
+
+// The worker handles cookie expiry cleanup automatically
+worker.port.onmessage = (event) => {
+  console.log('Received up-to-date cookies:', event.data);
+};
+
+worker.port.postMessage('Check for expired cookies.');
+
+```
