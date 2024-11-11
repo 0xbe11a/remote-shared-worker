@@ -114,26 +114,23 @@ worker.port.postMessage('Check for expired cookies.');
 #### 2. **Dynamic Filter Updates**
 - Use `updateFilter(newFilter)` to change the list of cookie prefixes at any time.
 
-Example:
-
 ```javascript
 worker.updateFilter(['session_']);
 ```
 
 #### 3. **Cookie Expiration Handling**
 - The worker inspects each cookie’s `expires` attribute and excludes expired cookies.
+```javascript
+import RemoteSharedWorker from 'remote-shared-worker';
 
-## 🔧 Implementation Details
+const worker = new RemoteSharedWorker('worker.js');
 
-The `RemoteSharedWorker` enhances `SharedWorker` with:
-- **Custom `importScripts` Override**
-- **Automatic Cookie Syncing**
-- **Cookie Expiration Handling**
+// The worker handles cookie expiry cleanup automatically
+worker.port.onmessage = (event) => {
+  console.log('Received up-to-date cookies:', event.data);
+};
 
-## 🛑 Troubleshooting
-- Ensure the script URL is accessible and supports cross-origin requests.
-- Verify that cookies are not blocked by browser settings.
+worker.port.postMessage('Check for expired cookies.');
 
-## 📝 Notes
-- **Browser Compatibility:** Works with browsers that support `SharedWorker`.
-- **Security:** Be cautious when syncing cookies. Use trusted scripts only.
+```
+
